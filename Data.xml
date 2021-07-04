@@ -201,7 +201,7 @@
       </Scan>
     </Item>
 
-    <Item Name="#Opera浏览器老版本备份（by Jhovany200）" Level="2">
+    <Item Name="#Opera浏览器老版本备份（by MS-PC2）" Level="2">
       <!--2017-11-23 13:50添加-->
       <Description>#Opera浏览器升级到新版本后留下的备份文件，在故障时回滚到老版本。</Description>
       <Group>#过期文件</Group>
@@ -683,6 +683,20 @@
       </Scan>
     </Item>
 
+<Item Name="#Windows Defender保护历史记录" Level="2">
+      <Description>#Windows Defender保护历史记录存放了Windows Defender日志，日志过多会导致打开保护历史记录记录闪退</Description>
+      <Warning>#清理后无法还原被隔离文件</Warning>
+      <Group>#应用程序</Group>
+      <Scan>
+        <Applicable>
+          <FileExist FilePath="%ProgramData%\Microsoft\Windows Defender\Scans\History"/>
+        </Applicable>
+        <Activate>
+          <General RootPath="%ProgramData%\Microsoft\Windows Defender\Scans\History"/>
+        </Activate>
+      </Scan>
+    </Item>
+
     <Item Name="#WebPI缓存" Level="2">
       <Description>#Web平台安装程序的缓存</Description>
       <Group>#应用程序</Group>
@@ -885,7 +899,6 @@
             <FileExist FilePath="%SystemDrive%\AMD"/>
             <FileExist FilePath="%SystemDrive%\Intel"/>
             <FileExist FilePath="%SystemDrive%\NVIDIA"/>
-            <FileExist FilePath="%SystemDrive%\Prog"/>
           </Or>
         </Applicable>
         <Activate>
@@ -904,13 +917,17 @@
       <Group>#临时文件</Group>
       <Scan Work="3">
         <Applicable>
-          <FileExist FilePath="%SystemDrive%\$Windows.~BT"/>
-          <FileExist FilePath="%SystemDrive%\$Windows.~WS"/>
+          <Or>
+            <FileExist FilePath="%SystemDrive%\$Windows.~BT"/>
+            <FileExist FilePath="%SystemDrive%\$Windows.~WS"/>
+            <FileExist FilePath="%SystemDrive%\$Windows.~LS"/>
+          </Or>
         </Applicable>
         <Activate>
           <General RootPath="%SystemDrive%" Flags="Directory">
             <Query>$Windows.~BT</Query>
             <Query>$Windows.~WS</Query>
+            <Query>$Windows.~LS</Query>
           </General>
         </Activate>
       </Scan>
@@ -1080,7 +1097,7 @@
       </ScanCollection>
     </Item>
 
-    <Item Name="#IDM临时文件（by Jhovany200）" Level="2">
+    <Item Name="#IDM临时文件（by MS-PC2）" Level="2">
       <Description>#Internet Download Manager临时下载文件。</Description>
       <Warning>#清理IDM临时文件可能导致正在下载的任务需要重新下载！</Warning>
       <Group>#临时文件</Group>
@@ -1838,16 +1855,19 @@
           <State>
             <Applicable>
               <RegExist Key="HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\People" Value="PeopleBand" Type="REG_DWORD" Data="0"/>
+              <RegExist Key="HKEY_CURRENT_USER\Software\Policies\Microsoft\Windows\Explorer" Value="HidePeopleBar" Type="REG_DWORD" Data="1"/>
             </Applicable>
           </State>
           <True>
             <Activate Restart="Explorer">
               <RegWrite Key="HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\People" Value="PeopleBand" Type="REG_DWORD" Data="0"/>
+              <RegWrite Key="HKEY_CURRENT_USER\Software\Policies\Microsoft\Windows\Explorer" Value="HidePeopleBar" Type="REG_DWORD" Data="1"/>
             </Activate>
           </True>
           <False>
             <Activate Restart="Explorer">
               <RegDelete Key="HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\People" Value="PeopleBand"/>
+              <RegDelete Key="HKEY_CURRENT_USER\Software\Policies\Microsoft\Windows\Explorer" Value="HidePeopleBar"/>
             </Activate>
           </False>
         </Current>
@@ -2028,6 +2048,7 @@
       <Item Type="CheckBox" Name="#使任务栏更透明（by 518516.net）">
         <Applicable>
           <OSVersion Compare=">=">10.0</OSVersion>
+          <OSVersion Compare="&lt;">10.0.17134</OSVersion>
         </Applicable>
         <System>
           <State>
@@ -2100,18 +2121,18 @@
           <Dropdown Name="#低质量（更快）">
             <Warning>#将导致桌面壁纸质量降低，影响视觉效果。</Warning>
             <Applicable>
-                <RegExist Key="HKEY_CURRENT_USER\Control Panel\Desktop" Value="JPEGImportQuality" Type="REG_DWORD" Data="60"/>
+                <RegExist Key="HKEY_CURRENT_USER\Control Panel\Desktop" Value="JPEGImportQuality" Type="REG_DWORD" Data="96"/>
             </Applicable>
             <Activate>
-              <RegWrite Key="HKEY_CURRENT_USER\Control Panel\Desktop" Value="JPEGImportQuality" Type="REG_DWORD" Data="60"/>
+              <RegWrite Key="HKEY_CURRENT_USER\Control Panel\Desktop" Value="JPEGImportQuality" Type="REG_DWORD" Data="96"/>
             </Activate>
           </Dropdown>
           <Dropdown Name="#默认（推荐）">
             <Applicable>
               <Not>
                 <Or>
-                  <RegExist Key="HKEY_CURRENT_USER\Control Panel\Desktop" Value="JPEGImportQuality" Type="REG_DWORD" Data="60"/>
-                  <RegExist Key="HKEY_CURRENT_USER\Control Panel\Desktop" Value="JPEGImportQuality" Type="REG_DWORD" Data="100"/>
+                  <RegExist Key="HKEY_CURRENT_USER\Control Panel\Desktop" Value="JPEGImportQuality" Type="REG_DWORD" Data="96"/>
+                  <RegExist Key="HKEY_CURRENT_USER\Control Panel\Desktop" Value="JPEGImportQuality" Type="REG_DWORD" Data="256"/>
                 </Or>
               </Not>
             </Applicable>
@@ -2122,10 +2143,10 @@
           <Dropdown Name="#高质量（更清晰）">
             <Warning>#将增加系统资源消耗。</Warning>
             <Applicable>
-              <RegExist Key="HKEY_CURRENT_USER\Control Panel\Desktop" Value="JPEGImportQuality" Type="REG_DWORD" Data="100"/>
+              <RegExist Key="HKEY_CURRENT_USER\Control Panel\Desktop" Value="JPEGImportQuality" Type="REG_DWORD" Data="256"/>
             </Applicable>
             <Activate>
-              <RegWrite Key="HKEY_CURRENT_USER\Control Panel\Desktop" Value="JPEGImportQuality" Type="REG_DWORD" Data="100"/>
+              <RegWrite Key="HKEY_CURRENT_USER\Control Panel\Desktop" Value="JPEGImportQuality" Type="REG_DWORD" Data="256"/>
             </Activate>
           </Dropdown>
         </Current>
@@ -2134,18 +2155,18 @@
           <Dropdown Name="#低质量（更快）">
             <Warning>#将导致桌面壁纸质量降低，影响视觉效果。</Warning>
             <Applicable>
-              <RegExist Key="HKEY_USERS\DEFAULT\Control Panel\Desktop" Value="JPEGImportQuality" Type="REG_DWORD" Data="60"/>
+              <RegExist Key="HKEY_USERS\DEFAULT\Control Panel\Desktop" Value="JPEGImportQuality" Type="REG_DWORD" Data="96"/>
             </Applicable>
             <Activate>
-              <RegWrite Key="HKEY_USERS\DEFAULT\Control Panel\Desktop" Value="JPEGImportQuality" Type="REG_DWORD" Data="60"/>
+              <RegWrite Key="HKEY_USERS\DEFAULT\Control Panel\Desktop" Value="JPEGImportQuality" Type="REG_DWORD" Data="96"/>
             </Activate>
           </Dropdown>
           <Dropdown Name="#默认（推荐）">
             <Applicable>
               <Not>
                 <Or>
-                  <RegExist Key="HKEY_USERS\DEFAULT\Control Panel\Desktop" Value="JPEGImportQuality" Type="REG_DWORD" Data="60"/>
-                  <RegExist Key="HKEY_USERS\DEFAULT\Control Panel\Desktop" Value="JPEGImportQuality" Type="REG_DWORD" Data="100"/>
+                  <RegExist Key="HKEY_USERS\DEFAULT\Control Panel\Desktop" Value="JPEGImportQuality" Type="REG_DWORD" Data="96"/>
+                  <RegExist Key="HKEY_USERS\DEFAULT\Control Panel\Desktop" Value="JPEGImportQuality" Type="REG_DWORD" Data="256"/>
                 </Or>
               </Not>
             </Applicable>
@@ -2156,10 +2177,10 @@
           <Dropdown Name="#高质量（更清晰）">
             <Warning>#将增加系统资源消耗。</Warning>
             <Applicable>
-              <RegExist Key="HKEY_USERS\DEFAULT\Control Panel\Desktop" Value="JPEGImportQuality" Type="REG_DWORD" Data="100"/>
+              <RegExist Key="HKEY_USERS\DEFAULT\Control Panel\Desktop" Value="JPEGImportQuality" Type="REG_DWORD" Data="256"/>
             </Applicable>
             <Activate>
-              <RegWrite Key="HKEY_USERS\DEFAULT\Control Panel\Desktop" Value="JPEGImportQuality" Type="REG_DWORD" Data="100"/>
+              <RegWrite Key="HKEY_USERS\DEFAULT\Control Panel\Desktop" Value="JPEGImportQuality" Type="REG_DWORD" Data="256"/>
             </Activate>
           </Dropdown>
         </Default>
@@ -2353,18 +2374,23 @@
         <System>
           <State>
             <Applicable>
-              <RegExist Key="HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows Defender" Value="DisableAntiSpyware" Type="REG_DWORD" Data="1"/>
+              <Or>
+                <RegExist Key="HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows Defender" Value="DisableAntiSpyware" Type="REG_DWORD" Data="1"/>
+                <RegExist Key="HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection" Value="DisableRealtimeMonitoring" Type="REG_DWORD" Data="1"/>
+              </Or>
             </Applicable>
           </State>
           <True>
             <Warning>#关闭Windows Defender后可提高计算机响应速度，但是也将增加电脑被攻击的几率！</Warning>
             <Activate>
               <RegWrite Key="HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows Defender" Value="DisableAntiSpyware" Type="REG_DWORD" Data="1"/>
+              <RegWrite Key="HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection" Value="DisableRealtimeMonitoring" Type="REG_DWORD" Data="1"/>
             </Activate>
           </True>
           <False>
             <Activate>
-              <RegDelete Key="HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows Defender" Value="DisableAntiSpyware"/>
+              <RegDelete Key="HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows Defender" Value="DisableAntiSpyware" SkipError="2"/>
+              <RegDelete Key="HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection" Value="DisableRealtimeMonitoring" SkipError="2"/>
             </Activate>
           </False>
         </System>
@@ -2766,7 +2792,7 @@
         </Default>
       </Item>
 
-      <Item Type="CheckBox" Name="#登陆界面默认打开小键盘（by IT之家）">
+      <Item Type="CheckBox" Name="#登录界面默认打开小键盘（by IT之家）">
         <System>
           <State>
             <Applicable>
@@ -2855,7 +2881,7 @@
           <False>
             <Activate>
               <RegWrite Key="HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" Value="EnableFirstLogonAnimation" Type="REG_DWORD" Data="0"/>
-              <RegExist Key="HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" Value="EnableFirstLogonAnimation" Type="REG_DWORD" Data="1"/>
+              <RegDelete Key="HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" Value="EnableFirstLogonAnimation"/>
             </Activate>
           </False>
         </System>
@@ -3065,7 +3091,35 @@
           </False>
         </System>
       </Item>
-
+      
+      <Item Type="CheckBox" Name="#shift右击时显示在此处打开命令窗口（by sandtechnology）"> 
+        <Applicable> 
+          <OSVersion Compare=">=">10.0.15063.0</OSVersion> 
+        </Applicable> 
+        <System> 
+          <State> 
+            <Applicable> 
+              <And> 
+                <RegExist Key="HKEY_CLASSES_ROOT\Directory\Background\shell\cmd" Value="ShowBasedOnVelocityId" Type="REG_DWORD"/>  
+                <RegExist Key="HKEY_CLASSES_ROOT\Directory\shell\cmd" Value="ShowBasedOnVelocityId" Type="REG_DWORD"/> 
+              </And> 
+            </Applicable> 
+          </State>  
+          <True> 
+            <Activate> 
+              <RegMove Key="HKEY_CLASSES_ROOT\Directory\shell\cmd" NewKey="HKEY_CLASSES_ROOT\Directory\shell\cmd" Value="HideBasedOnVelocityId" NewValue="ShowBasedOnVelocityId"/>  
+              <RegMove Key="HKEY_CLASSES_ROOT\Directory\Background\shell\cmd" NewKey="HKEY_CLASSES_ROOT\Directory\Background\shell\cmd" Value="HideBasedOnVelocityId" NewValue="ShowBasedOnVelocityId"/> 
+            </Activate> 
+          </True>  
+          <False> 
+            <Activate> 
+              <RegMove Key="HKEY_CLASSES_ROOT\Directory\shell\cmd" NewKey="HKEY_CLASSES_ROOT\Directory\shell\cmd" Value="ShowBasedOnVelocityId" NewValue="HideBasedOnVelocityId"/>  
+              <RegMove Key="HKEY_CLASSES_ROOT\Directory\Background\shell\cmd" NewKey="HKEY_CLASSES_ROOT\Directory\Background\shell\cmd" Value="ShowBasedOnVelocityId" NewValue="HideBasedOnVelocityId"/> 
+            </Activate> 
+          </False> 
+        </System> 
+      </Item> 
+      
       <Item Type="CheckBox" Name="#创建快捷方式时不添&quot;快捷方式&quot;文字（by 518516.net）">
         <Current>
           <State>
@@ -4560,6 +4614,7 @@
 
       <Item Type="CheckBox" Name="#隐藏资源管理器导航窗口中的家庭组">
         <Applicable>
+          <FileExist FilePath="%SystemRoot%\System32\provsvc.dll"/>
           <RegExist Key="HKEY_CLASSES_ROOT\CLSID\{B4FB3F98-C1EA-428d-A78A-D1F5659CBA93}\ShellFolder" Value="Attributes" Type="REG_DWORD"/>
         </Applicable>
         <System>
@@ -5480,7 +5535,7 @@
           <True>
             <Activate>
               <RegMove Key="HKEY_CLASSES_ROOT\*\shellex\ContextMenuHandlers\WorkFolders" NewKey="HKEY_CLASSES_ROOT\*\-shellex\ContextMenuHandlers\WorkFolders" SkipError="2"/>
-              <RegMove Key="HKEY_CLASSES_ROOT\Directory\shellex\ContextMenuHandlers\WorkFolders" NewKey="HKEY_CLASSES_ROOT\Directory\shellex\ContextMenuHandlers\WorkFolders" SkipError="2"/>
+              <RegMove Key="HKEY_CLASSES_ROOT\Directory\shellex\ContextMenuHandlers\WorkFolders" NewKey="HKEY_CLASSES_ROOT\Directory\-shellex\ContextMenuHandlers\WorkFolders" SkipError="2"/>
               <RegMove Key="HKEY_CLASSES_ROOT\Directory\background\shellex\ContextMenuHandlers\WorkFolders" NewKey="HKEY_CLASSES_ROOT\Directory\background\-shellex\ContextMenuHandlers\WorkFolders" SkipError="2"/>
               <RegMove Key="HKEY_CLASSES_ROOT\AllFilesystemObjects\shell\LaunchWorkfoldersControl" NewKey="HKEY_CLASSES_ROOT\AllFilesystemObjects\-shell\LaunchWorkfoldersControl" SkipError="2"/>
             </Activate>
@@ -5488,7 +5543,7 @@
           <False>
             <Activate>
               <RegMove NewKey="HKEY_CLASSES_ROOT\*\shellex\ContextMenuHandlers\WorkFolders" Key="HKEY_CLASSES_ROOT\*\-shellex\ContextMenuHandlers\WorkFolders" SkipError="2"/>
-              <RegMove NewKey="HKEY_CLASSES_ROOT\Directory\shellex\ContextMenuHandlers\WorkFolders" Key="HKEY_CLASSES_ROOT\Directory\shellex\ContextMenuHandlers\WorkFolders" SkipError="2"/>
+              <RegMove NewKey="HKEY_CLASSES_ROOT\Directory\shellex\ContextMenuHandlers\WorkFolders" Key="HKEY_CLASSES_ROOT\Directory\-shellex\ContextMenuHandlers\WorkFolders" SkipError="2"/>
               <RegMove NewKey="HKEY_CLASSES_ROOT\Directory\background\shellex\ContextMenuHandlers\WorkFolders" Key="HKEY_CLASSES_ROOT\Directory\background\-shellex\ContextMenuHandlers\WorkFolders" SkipError="2"/>
               <RegMove NewKey="HKEY_CLASSES_ROOT\AllFilesystemObjects\shell\LaunchWorkfoldersControl" Key="HKEY_CLASSES_ROOT\AllFilesystemObjects\-shell\LaunchWorkfoldersControl" SkipError="2"/>
             </Activate>
@@ -6448,6 +6503,36 @@
       </Item>
     </Group>
 
+    <Group Name="#微软注音输入法">
+      <Applicable>
+        <RegExist Key="HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\IME\15.0\IMETC"/>
+      </Applicable>
+
+      <Item Type="Combo" Name="#默认输入模式（by iliGPU）：">
+        <Applicable>
+          <RegExist Key="HKEY_CURRENT_USER\Software\Microsoft\IME\15.0\IMETC"/>
+        </Applicable>
+        <Current>
+          <Dropdown Name="#中文模式">
+            <Applicable>
+              <RegExist Key="HKEY_CURRENT_USER\Software\Microsoft\IME\15.0\IMETC" Value="Default Input Mode" Type="REG_DWORD" Data="0"/>
+            </Applicable>
+            <Activate>
+              <RegWrite Key="HKEY_CURRENT_USER\Software\Microsoft\IME\15.0\IMETC" Value="Default Input Mode" Type="REG_DWORD" Data="0"/>
+            </Activate>
+          </Dropdown>
+          <Dropdown Name="#英数模式">
+            <Applicable>
+              <RegExist Key="HKEY_CURRENT_USER\Software\Microsoft\IME\15.0\IMETC" Value="Default Input Mode" Type="REG_DWORD" Data="1"/>
+            </Applicable>
+            <Activate>
+              <RegWrite Key="HKEY_CURRENT_USER\Software\Microsoft\IME\15.0\IMETC" Value="Default Input Mode" Type="REG_DWORD" Data="1"/>
+            </Activate>
+          </Dropdown>
+        </Current>
+      </Item>
+    </Group>
+    
     <Group Name="Windows Update">
       <Item Type="CheckBox" Name="#自动安装无需重启的更新（by Rambin）">
         <System>
@@ -6607,7 +6692,7 @@
             </Applicable>
             <Activate>
               <RegWrite Key="HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" Value="AUOptions" Type="REG_DWORD" Data="2"/>
-              <RegWrite Key="HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" Value="NoAutoUpdate" Type="REG_DWORD" Data="1"/>
+              <RegDelete Key="HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" Value="NoAutoUpdate" SkipError="2"/>
             </Activate>
           </Dropdown>
           <Dropdown Name="#检查并下载更新">
@@ -6616,7 +6701,7 @@
             </Applicable>
             <Activate>
               <RegWrite Key="HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" Value="AUOptions" Type="REG_DWORD" Data="3"/>
-              <RegWrite Key="HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" Value="NoAutoUpdate" Type="REG_DWORD" Data="1"/>
+              <RegDelete Key="HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" Value="NoAutoUpdate" SkipError="2"/>
             </Activate>
           </Dropdown>
           <Dropdown Name="#自动安装更新（推荐）">
@@ -6629,8 +6714,8 @@
               </Or>
             </Applicable>
             <Activate>
-              <RegWrite Key="HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" Value="AUOptions" Type="REG_DWORD" Data="4"/>
-              <RegWrite Key="HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" Value="NoAutoUpdate" Type="REG_DWORD" Data="0"/>
+              <RegDelete Key="HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" Value="AUOptions" SkipError="2"/>
+              <RegDelete Key="HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" Value="NoAutoUpdate" SkipError="2"/>
             </Activate>
           </Dropdown>
         </System>
@@ -6862,7 +6947,7 @@
         </System>
       </Item>
 
-      <Item Type="CheckBox" Name="#*禁用SMB1网络协议（by Jhovany200）">
+      <Item Type="CheckBox" Name="#*禁用SMB1网络协议（by MS-PC2）">
         <Applicable>
           <!--仅用于Vista以及Windows 7-->
           <OSVersion Compare="&lt;=">6.1</OSVersion>
@@ -7030,6 +7115,7 @@
 
       <Item Type="CheckBox" Name="#禁用家庭组">
         <Applicable>
+          <FileExist FilePath="%SystemRoot%\System32\provsvc.dll"/>
           <QueryServiceStart Name="HomeGroupProvider"/>
         </Applicable>
         <System>
@@ -7757,6 +7843,7 @@
     <Item>$Recycle.Bin</Item>
     <Item>$Windows.~BT</Item>
     <Item>$Windows.~WS</Item>
+    <Item>$Windows.~LS</Item>
     <Item>Recycler</Item>
     <Item>Recycled</Item>
     <Item>PerfLogs</Item>
@@ -7782,8 +7869,11 @@
     <!--过滤Linux子系统，以免备份失败-->
     <Item>Users\*\AppData\Local\lxss</Item>
     <Item>Users\*\AppData\Local\Packages\CanonicalGroupLimited.UbuntuonWindows_79rhkp1fndgsc\LocalState\rootfs\</Item>
+    <Item>Users\*\AppData\Local\Packages\CanonicalGroupLimited.Ubuntu18.04onWindows_79rhkp1fndgsc\LocalState\rootfs\</Item>
+    <Item>Users\*\AppData\Local\Packages\CanonicalGroupLimited.Ubuntu16.04onWindows_79rhkp1fndgsc\LocalState\rootfs\</Item>
     <!--过滤OneDrive，避免1803无法复制-->
     <Item>Users\*\OneDrive</Item>
+    <Item>Users\*\OneDrive - *</Item>
   </DefaultFilterList>
   <TimeZoneMap>
     <x2>SA Western Standard Time</x2>
